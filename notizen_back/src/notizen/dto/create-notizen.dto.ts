@@ -3,4 +3,5 @@ export class CreateNotizenDto {
     titel: string;
     text: string;
     ps: string;
+    test: string;
 }
