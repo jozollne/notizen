@@ -46,7 +46,13 @@
         h-auto
       >
         <v-alert border border-color='primary'>
-          {{Notiz[nr].text}}
+          <p>
+            {{Notiz[nr].text}}
+          </p>
+
+          <p v-if="Notiz[nr].ps != null">
+            PS: {{Notiz[nr].ps}}
+          </p>
         </v-alert>
       </v-sheet>
     </v-expand-transition>
