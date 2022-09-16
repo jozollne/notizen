@@ -4,89 +4,82 @@
       <v-btn @click="all">
         all
       </v-btn>
-      <div>{{ activePanel }}</div>
+      <div>
+        <v-card>
+          {{ activePanel }}
+        </v-card>
+      </div>
       <v-btn @click="none">
         none
       </v-btn>
     </div>
 
-    <v-sheet 
-      class="mx-auto"
-      max-width="mx-auto"
-    >
-      <v-slide-group
-        class="pa-4"
-        center-active
-        selected-class="bg-primary"
-        show-arrows
+    <center>
+      <v-btn 
+        rounded
+        :class="['ma-2']"
+        @click="Post = !Post"
       >
-        <v-slide-group-item>
+       Neue Notiz
+     </v-btn>
+
+      <v-btn
+        rounded
+        :class="['ma-2']"
+      >
+        Bearbeiten
+     </v-btn>
+
+      <v-btn
+        rounded
+        :class="['ma-2']"
+      >
+        Löschen
+      </v-btn>
+    </center>
+    
+    <v-expand-transition>
+      <v-sheet
+        v-if="Post == true"
+        h-auto
+        rounded
+        class="my-4"
+      >
+        <v-expand-transition>
+          <v-text-field
+            label="Titel"
+            :rules="rules"
+            hide-details="auto"
+            v-model="titel"
+           ></v-text-field>
+        </v-expand-transition>
+
+        <v-expand-transition>
+           <v-textarea
+            label="Text"
+            hide-details="auto"
+            v-model="text"
+          ></v-textarea>
+        </v-expand-transition>
+
+        <v-expand-transition>
+          <v-text-field
+            label="PS"
+            hide-details="auto"
+            v-model="ps"
+          ></v-text-field>
+        </v-expand-transition>
+
+        <v-expand-transition>
           <v-btn 
-            rounded
-            :class="['ma-2']"
-            @click="Post = !Post"
+            block
+            @click="post"
           >
-            Neue Notiz
+            Notiz hinzufügen
           </v-btn>
-
-        </v-slide-group-item>
-
-        <v-btn
-          rounded
-          :class="['ma-2']"
-        >
-          Bearbeiten
-        </v-btn>
-
-        <v-btn
-          rounded
-          :class="['ma-2']"
-        >
-          Löschen
-        </v-btn>
-      </v-slide-group>
-
-      <v-expand-transition>
-        <v-sheet
-          v-if="Post == true"
-          h-auto
-        >
-          <v-expand-transition>
-            <v-text-field
-              label="Titel"
-              :rules="rules"
-              hide-details="auto"
-              v-model="titel"
-            ></v-text-field>
-          </v-expand-transition>
-
-          <v-expand-transition>
-            <v-textarea
-              label="Text"
-              hide-details="auto"
-              v-model="text"
-            ></v-textarea>
-          </v-expand-transition>
-
-          <v-expand-transition>
-            <v-text-field
-              label="PS"
-              hide-details="auto"
-              v-model="ps"
-            ></v-text-field>
-          </v-expand-transition>
-
-          <v-expand-transition>
-            <v-btn 
-              block
-              @click="post"
-            >
-              Notiz hinzufügen
-            </v-btn>
-          </v-expand-transition>
-        </v-sheet>
-      </v-expand-transition>
-    </v-sheet>
+        </v-expand-transition>
+      </v-sheet>
+    </v-expand-transition>
 
     <v-expansion-panels
       v-model="activePanel"
@@ -142,6 +135,7 @@ export default defineComponent({
         //#region auswahl welches Panel aktiv ist
         activePanel: [],
         //#endregion
+        clicked: false,
     };
   },
 
@@ -182,3 +176,19 @@ export default defineComponent({
 
 })
 </script>
+
+<style>
+  .white {
+      background-color: white;
+      width: 200px;
+      height: 200px;  
+
+  }
+  .blue {
+      width: 200px;
+      height: 200px;
+      background-color: rgb(0, 0, 0);
+  }
+
+
+</style>

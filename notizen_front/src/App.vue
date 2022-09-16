@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="app" :class="(mode === 'dark') ? 'dark' : ''">
     <!-- <Test :notizen="notizen"/> -->
     <NotizenListeExPanel :notizen="notizen" />
   </div>
@@ -16,7 +16,8 @@ export default defineComponent({
 
   data() {
     return {
-      notizen: Array
+      notizen: Array,
+      mode: 'dark'
     };
   },
 
@@ -47,3 +48,24 @@ export default defineComponent({
 })
 
 </script>
+
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Roboto', sans-serif;
+  }
+
+  .app {
+    width: 100vw;
+    height: 100vh;
+    background: #f3f3f3;
+    color: #15202b;
+  }
+
+  .dark {
+    background-color: #0d151b;
+    color: #000000;
+  }
+</style>

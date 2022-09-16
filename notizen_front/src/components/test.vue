@@ -1,29 +1,33 @@
 <template>
-      <div class="text-center d-flex pb-4">
-        <v-btn @click="all">
-          all
-        </v-btn>
-        <div>{{ activePanel }}</div>
-        <v-btn @click="none">
-          none
-        </v-btn>
-      </div>
-  
-      <v-expansion-panels
-        v-model="activePanel"
-        variant="popout"
-        class="my-4"
+<v-sheet
+    class="mx-auto"
+    max-width="600"
+  >
+    <v-slide-group
+      show-arrows
+    >
+      <v-slide-group-item
+        v-slot="{ isSelected, toggle }"
       >
-        <v-expansion-panel
-          v-for="(notiz,i) in notizen"
-          :key="i"
+        <v-btn
+          class="ma-2"
+          rounded
+          :color="isSelected ? 'primary' : undefined"
+          @click="toggle"
         >
-          <v-expansion-panel-title> {{ notiz.titel }}</v-expansion-panel-title>
-          <v-expansion-panel-text>
-            {{notiz.text}}
-          </v-expansion-panel-text>
-        </v-expansion-panel>
-      </v-expansion-panels>
+          Options
+        </v-btn>
+        <v-btn
+          class="ma-2"
+          rounded
+          :color="isSelected ? 'primary' : undefined"
+          @click="toggle"
+        >
+          Options
+        </v-btn>
+      </v-slide-group-item>
+    </v-slide-group>
+  </v-sheet>
   </template>
 
 <script lang="ts">
