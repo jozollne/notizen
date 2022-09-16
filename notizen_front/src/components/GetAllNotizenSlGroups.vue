@@ -12,8 +12,8 @@
       show-arrows
     >
       <v-slide-group-item
-        v-for="n in Notiz?.length"
-        :key="n"
+        v-for="i in Notiz?.length"
+        :key="i"
         v-slot="{ isSelected, toggle, selectedClass }"
       >
         <v-btn
@@ -22,7 +22,7 @@
           rounded
           @click="toggle"
         >
-          {{Notiz[n-1].titel}}
+          {{Notiz[i-1].titel}}
         </v-btn>
       </v-slide-group-item>
     </v-slide-group>

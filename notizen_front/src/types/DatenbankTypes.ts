@@ -1,4 +1,4 @@
-export default interface daten{
+export default interface Notizen{
     id: number;
     titel: string;
     text: string;
