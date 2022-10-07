@@ -1,6 +1,9 @@
 <template>
   <div>
     <div class="text-center d-flex pb-4">
+      <v-card>
+        {{link}}
+      </v-card>
       <v-btn @click="all">
         all
       </v-btn>
@@ -28,13 +31,20 @@
         :class="['ma-2']"
       >
         Bearbeiten
-     </v-btn>
+      </v-btn>
 
       <v-btn
         rounded
         :class="['ma-2']"
       >
         Löschen
+      </v-btn>
+
+      <v-btn
+        rounded
+        :class="['ma-2']"
+      >
+        Test
       </v-btn>
     </center>
     
@@ -88,13 +98,13 @@
       multiple
     >
       <v-expansion-panel
-        v-for="(notiz,i) in notizen"
-        :key="i"
+        v-for="notiz in notizen"
+        :key="notiz.id"
       >    
         <v-expansion-panel-title
           class="text-h6"
         >
-          {{ notiz.titel }}
+          {{ notiz.titel }} {{}} {{notiz.id}}
         </v-expansion-panel-title>
 
         <v-expansion-panel-text>
@@ -105,6 +115,13 @@
           <p v-if="notiz.ps != null">
             PS: {{ notiz.ps }}
           </p>
+          <v-btn
+            block
+            color="grey"
+            @click="test(notiz.id)"
+          >
+            Löschen
+          </v-btn>
         </v-expansion-panel-text>
       </v-expansion-panel>
     </v-expansion-panels>
@@ -115,12 +132,14 @@
 
 import { defineComponent, PropType } from '@vue/runtime-dom';
 import axios from 'axios';
+import { link } from 'fs';
 import Notiz from '../types/DatenbankTypes'
 export default defineComponent({
 
   data() {
     
     return {
+        link: '0',
         //Animation Notiz hinzufügen
         Post: false,
         //#region Notiz hinzufügen
@@ -147,32 +166,50 @@ export default defineComponent({
   },
 
   methods: {
-        //#region auswahl welches Panel aktiv ist
-        all () {
-          this.activePanel = [...Array(this.notizen.length).keys()].map((i) => i)
-        },
-        none () {
-          this.activePanel = []
-        },
-        //#endregion
+    //#region auswahl welches Panel aktiv ist
+    all () {
+      this.activePanel = [...Array(this.notizen.length).keys()].map((i) => i)
+    },
 
-        //#region Post methode für DB
-        post() {
-            const options = {
-                method: 'POST',
-                url: 'http://localhost:3000/notizen/',
-                data: { titel: this.titel, text: this.text, ps: this.ps }
-            };
+    none () {
+      this.activePanel = []
+    },
+    //#endregion
 
-            axios.request(options).then(function (response) {
-                console.log(response.data);
-            }).catch(function (error) {
-                console.error(error);
-            });
-        },
-        //#endregion
+    //#region Post methode für DB
+    post() {
+      const options = {
+        method: 'POST',
+        url: 'http://localhost:3000/notizen/',
+        data: { titel: this.titel, text: this.text, ps: this.ps }
+      };
 
-      },
+      axios.request(options).then(function (response) {
+        console.log(response.data);
+      }).catch(function (error) {
+        console.error(error);
+      });
+    },
+    //#endregion
+
+    delete() {
+      const options = {
+        method: 'DELETE',
+        url: 'http://localhost:3000/notizen/' + this.id,
+        data: {}
+      };
+
+      axios.request(options).then(function (response) {
+        console.log(response.data);
+      }).catch(function (error) {
+        console.error(error);
+      });
+    },
+
+    test(link: number) {
+      this.link = link
+    },
+  },
 
 })
 </script>
