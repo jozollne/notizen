@@ -1,6 +1,9 @@
 <template>
   <div class="app" :class="(mode === 'dark') ? 'dark' : ''">
-    <NotizenListeExPanel :notizen="notizen" @refresh="get"/>
+    <AddNotizen @refresh="get"/>
+    <div v-for="notiz in notizen">
+      <NotizenListeExPanel :notiz="notiz"  @refresh="get"/>
+    </div>
   </div>
 </template>
 
@@ -8,8 +11,8 @@
 import axios from 'axios';
 import { defineComponent } from 'vue';
 import NotizenListeExPanel from './components/NotizenListeExPanel.vue';
-import GetAllNotizenSlGroups from './components/GetAllNotizenSlGroups.vue';
 import Test from './components/Test.vue';
+import AddNotizen from './components/AddNotizen.vue';
 
 export default defineComponent({
   data() {
@@ -21,9 +24,8 @@ export default defineComponent({
 
   components: {
     NotizenListeExPanel,
-    GetAllNotizenSlGroups,
     Test,
-    
+    AddNotizen
 },
 
   methods: {    
@@ -50,8 +52,7 @@ export default defineComponent({
 
 <style>
   .dark {
-    height: auto;
-    background-color: #0d151b;
+    background-color: #1e1e1e;
     color: #000000;
   }
 </style>

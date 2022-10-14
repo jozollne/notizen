@@ -1,81 +1,11 @@
 <template>
   <div>
-      <v-btn 
-        @click="$emit('refresh')"
-      >
-        refresh DB
-      </v-btn>
-
-      <v-btn 
-        rounded
-        :class="['ma-2']"
-        @click="Post = !Post"
-      >
-       Neue Notiz
-     </v-btn>
-    
-    <v-expand-transition>
-      <v-sheet
-        v-if="Post == true"
-        h-auto
-        rounded
-        class="my-4"
-      >
-        <v-expand-transition>
-          <v-text-field
-            label="Titel"
-            :rules="rules"
-            hide-details="auto"
-            v-model="titel"
-           ></v-text-field>
-        </v-expand-transition>
-
-        <v-expand-transition>
-           <v-textarea
-            auto-grow
-            rows="3"
-            label="Text"
-            hide-details="auto"
-            v-model="text"
-          ></v-textarea>
-        </v-expand-transition>
-
-        <v-expand-transition>
-          <v-text-field
-            label="PS"
-            hide-details="auto"
-            v-model="ps"
-          ></v-text-field>
-        </v-expand-transition>
-
-        <v-expand-transition>
-          <v-btn 
-            block
-            :loading="loading[-1]"
-            :disabled="loading[-1]"
-            @click="post(-1)"
-          >
-            Notiz hinzufügen
-            <template v-slot:loader>
-              <span class="custom-loader">
-                <v-icon light>mdi-cached</v-icon>
-              </span>
-            </template>
-          </v-btn>
-        </v-expand-transition>
-      </v-sheet>
-    </v-expand-transition>
-
     <v-expansion-panels
       variant="popout"
       class="my-4"
-      multiple
+      v-model="activePanel"
     >
-      <v-expansion-panel
-        v-for="notiz in notizen"
-        :key="notiz.id"
-        v-model="form"
-      >    
+      <v-expansion-panel>    
         <v-expansion-panel-title
           class="text-h6"
         >
@@ -84,6 +14,7 @@
         
         <v-expansion-panel-text>
           <v-text-field
+            clearable
             :rules="rules"
             label="Titel"
             variant="solo"
@@ -92,6 +23,7 @@
           </v-text-field>
 
           <v-textarea
+            clearable
             :rules="rules"
             auto-grow
             max-rows="7"
@@ -103,6 +35,7 @@
           </v-textarea>
           
           <v-text-field
+            clearable
             label="PS"
             variant="solo"
             v-model="notiz.ps"
@@ -112,18 +45,19 @@
           <v-btn
             icon
             color="red"
-            :loading="loading[notiz.id]"
-            :disabled="loading[notiz.id]"
+            :loading="loadingDelete"
+            :disabled="loadingDelete"
             @click="remove(notiz.id)"
           >
             <v-icon>mdi-cancel</v-icon>
           </v-btn>
+
           <v-btn
             icon
             color="orange"
-            :loading="loading[notiz.id+1111]"
-            :disabled="loading[notiz.id+1111]"
-            @click="update(notiz.id+1111, notiz.titel, notiz.text, notiz.ps)"
+            :loading="loadingUpdate"
+            :disabled="loadingUpdate"
+            @click="update(notiz.id, notiz.titel, notiz.text, notiz.ps)"
           >
             <v-icon>mdi-pencil</v-icon>
           </v-btn>
@@ -144,21 +78,16 @@ export default defineComponent({
   data() {
     
     return {
-        form: false,
         //Laden Animation
-        loading: [],
+        loadingUpdate: false,
+        loadingDelete: false,
         //id der Notiz
         id: '0',
-        //Animation Notiz hinzufügen
-        Post: false,
-        //#region Notiz hinzufügen
+        //rules
         rules: [
-        value => !!value || 'Required.',
-        value => (value && value.length >= 3) || 'Min 3 characters',
+          value => !!value || 'Required.',
+          value => (value && value.length >= 3) || 'Min 3 characters',
         ],
-        titel: '',
-        text: '',
-        ps: '',
         //#endregion
         //#region auswahl welches Panel aktiv ist
         activePanel: [],
@@ -168,41 +97,13 @@ export default defineComponent({
   },
 
   props: {
-    notizen: {
+    notiz: {
       required: true,
-      type: Array as PropType<Notiz[]>
+      type: Object as PropType<Notiz>
     }
   },
 
   methods: {    
-    //#region Post methode für DB
-    post(id: number) {
-      const options = {
-        method: 'POST',
-        url: 'http://localhost:3000/notizen/',
-        data: { titel: this.titel, text: this.text, ps: this.ps }
-      };
-
-      axios.request(options).then(function (response) {
-        console.log(response.data);
-      }).catch(function (error) {
-        console.error(error);
-      });
-
-      this.titel = ''
-      this.text = ''
-      this.ps = ''
-      this.loading[id] = true
-
-      setTimeout(() => {
-          this.$emit('refresh')
-          this.Post = !this.Post
-          this.loading[id] = false
-        },
-      1000)
-    },
-    //#endregion
-
     remove(id: number) {
       this.id = id
       const options = {
@@ -217,19 +118,19 @@ export default defineComponent({
         console.error(error);
       });
 
-      this.loading[id] = true
+      this.loadingDelete = true
       
       setTimeout(() => {
-          this.$emit('refresh')
-          this.loading[id] = false
-        },
-      1000)
+        this.activePanel = ''
+        this.$emit('refresh')
+        this.loadingDelete = false
+      },1000)
     },
 
-    update(id: number, titel: string, text: string, ps: undefined) {
+    update(id: number, titel: string, text: string, ps: string | undefined) {
       const options = {
         method: 'PATCH',
-        url: 'http://localhost:3000/notizen/' + (id-1111),
+        url: 'http://localhost:3000/notizen/' + (id),
         data: {titel: titel, text: text, ps: ps}
       };
 
@@ -239,13 +140,12 @@ export default defineComponent({
         console.error(error);
       });
 
-      this.loading[id] = true
+      this.loadingUpdate = true
 
       setTimeout(() => {
-          this.$emit('refresh')
-          this.loading[id] = false
-        },
-      1000)
+        this.$emit('refresh')
+        this.loadingUpdate = false
+      },1000)
     },
   },
 })
