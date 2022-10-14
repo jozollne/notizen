@@ -1,23 +1,11 @@
 <template>
   <div>
-    <div class="text-center d-flex pb-4">
-      <v-card>
-        {{link}}
-      </v-card>
-      <v-btn @click="all">
-        all
+      <v-btn 
+        @click="$emit('refresh')"
+      >
+        refresh DB
       </v-btn>
-      <div>
-        <v-card>
-          {{ activePanel }}
-        </v-card>
-      </div>
-      <v-btn @click="none">
-        none
-      </v-btn>
-    </div>
 
-    <center>
       <v-btn 
         rounded
         :class="['ma-2']"
@@ -25,28 +13,6 @@
       >
        Neue Notiz
      </v-btn>
-
-      <v-btn
-        rounded
-        :class="['ma-2']"
-      >
-        Bearbeiten
-      </v-btn>
-
-      <v-btn
-        rounded
-        :class="['ma-2']"
-      >
-        Löschen
-      </v-btn>
-
-      <v-btn
-        rounded
-        :class="['ma-2']"
-      >
-        Test
-      </v-btn>
-    </center>
     
     <v-expand-transition>
       <v-sheet
@@ -66,6 +32,8 @@
 
         <v-expand-transition>
            <v-textarea
+            auto-grow
+            rows="3"
             label="Text"
             hide-details="auto"
             v-model="text"
@@ -83,16 +51,22 @@
         <v-expand-transition>
           <v-btn 
             block
-            @click="post"
+            :loading="loading[-1]"
+            :disabled="loading[-1]"
+            @click="post(-1)"
           >
             Notiz hinzufügen
+            <template v-slot:loader>
+              <span class="custom-loader">
+                <v-icon light>mdi-cached</v-icon>
+              </span>
+            </template>
           </v-btn>
         </v-expand-transition>
       </v-sheet>
     </v-expand-transition>
 
     <v-expansion-panels
-      v-model="activePanel"
       variant="popout"
       class="my-4"
       multiple
@@ -100,27 +74,58 @@
       <v-expansion-panel
         v-for="notiz in notizen"
         :key="notiz.id"
+        v-model="form"
       >    
         <v-expansion-panel-title
           class="text-h6"
         >
-          {{ notiz.titel }} {{}} {{notiz.id}}
+          {{notiz.titel}}
         </v-expansion-panel-title>
-
+        
         <v-expansion-panel-text>
-          <p>
-            {{ notiz.text }}
-          </p>
+          <v-text-field
+            :rules="rules"
+            label="Titel"
+            variant="solo"
+            v-model="notiz.titel"
+          >  
+          </v-text-field>
 
-          <p v-if="notiz.ps != null">
-            PS: {{ notiz.ps }}
-          </p>
-          <v-btn
-            block
-            color="grey"
-            @click="test(notiz.id)"
+          <v-textarea
+            :rules="rules"
+            auto-grow
+            max-rows="7"
+            rows="2"
+            label="Text"
+            variant="solo"
+            v-model="notiz.text"
           >
-            Löschen
+          </v-textarea>
+          
+          <v-text-field
+            label="PS"
+            variant="solo"
+            v-model="notiz.ps"
+          >
+          </v-text-field>
+
+          <v-btn
+            icon
+            color="red"
+            :loading="loading[notiz.id]"
+            :disabled="loading[notiz.id]"
+            @click="remove(notiz.id)"
+          >
+            <v-icon>mdi-cancel</v-icon>
+          </v-btn>
+          <v-btn
+            icon
+            color="orange"
+            :loading="loading[notiz.id+1111]"
+            :disabled="loading[notiz.id+1111]"
+            @click="update(notiz.id+1111, notiz.titel, notiz.text, notiz.ps)"
+          >
+            <v-icon>mdi-pencil</v-icon>
           </v-btn>
         </v-expansion-panel-text>
       </v-expansion-panel>
@@ -130,16 +135,20 @@
   
 <script lang="ts">
 
-import { defineComponent, PropType } from '@vue/runtime-dom';
-import axios from 'axios';
-import { link } from 'fs';
+import { defineComponent, PropType } from '@vue/runtime-dom'
+import axios from 'axios'
 import Notiz from '../types/DatenbankTypes'
+
 export default defineComponent({
 
   data() {
     
     return {
-        link: '0',
+        form: false,
+        //Laden Animation
+        loading: [],
+        //id der Notiz
+        id: '0',
         //Animation Notiz hinzufügen
         Post: false,
         //#region Notiz hinzufügen
@@ -165,19 +174,9 @@ export default defineComponent({
     }
   },
 
-  methods: {
-    //#region auswahl welches Panel aktiv ist
-    all () {
-      this.activePanel = [...Array(this.notizen.length).keys()].map((i) => i)
-    },
-
-    none () {
-      this.activePanel = []
-    },
-    //#endregion
-
+  methods: {    
     //#region Post methode für DB
-    post() {
+    post(id: number) {
       const options = {
         method: 'POST',
         url: 'http://localhost:3000/notizen/',
@@ -189,13 +188,26 @@ export default defineComponent({
       }).catch(function (error) {
         console.error(error);
       });
+
+      this.titel = ''
+      this.text = ''
+      this.ps = ''
+      this.loading[id] = true
+
+      setTimeout(() => {
+          this.$emit('refresh')
+          this.Post = !this.Post
+          this.loading[id] = false
+        },
+      1000)
     },
     //#endregion
 
-    delete() {
+    remove(id: number) {
+      this.id = id
       const options = {
         method: 'DELETE',
-        url: 'http://localhost:3000/notizen/' + this.id,
+        url: 'http://localhost:3000/notizen/' + id,
         data: {}
       };
 
@@ -204,28 +216,37 @@ export default defineComponent({
       }).catch(function (error) {
         console.error(error);
       });
+
+      this.loading[id] = true
+      
+      setTimeout(() => {
+          this.$emit('refresh')
+          this.loading[id] = false
+        },
+      1000)
     },
 
-    test(link: number) {
-      this.link = link
+    update(id: number, titel: string, text: string, ps: undefined) {
+      const options = {
+        method: 'PATCH',
+        url: 'http://localhost:3000/notizen/' + (id-1111),
+        data: {titel: titel, text: text, ps: ps}
+      };
+
+      axios.request(options).then(function (response) {
+        console.log(response.data);
+      }).catch(function (error) {
+        console.error(error);
+      });
+
+      this.loading[id] = true
+
+      setTimeout(() => {
+          this.$emit('refresh')
+          this.loading[id] = false
+        },
+      1000)
     },
   },
-
 })
 </script>
-
-<style>
-  .white {
-      background-color: white;
-      width: 200px;
-      height: 200px;  
-
-  }
-  .blue {
-      width: 200px;
-      height: 200px;
-      background-color: rgb(0, 0, 0);
-  }
-
-
-</style>

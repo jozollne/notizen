@@ -1,7 +1,6 @@
 <template>
   <div class="app" :class="(mode === 'dark') ? 'dark' : ''">
-    <!-- <Test :notizen="notizen"/> -->
-    <NotizenListeExPanel :notizen="notizen" />
+    <NotizenListeExPanel :notizen="notizen" @refresh="get"/>
   </div>
 </template>
 
@@ -10,10 +9,9 @@ import axios from 'axios';
 import { defineComponent } from 'vue';
 import NotizenListeExPanel from './components/NotizenListeExPanel.vue';
 import GetAllNotizenSlGroups from './components/GetAllNotizenSlGroups.vue';
-import Test from './components/test.vue';
+import Test from './components/Test.vue';
 
 export default defineComponent({
-
   data() {
     return {
       notizen: Array,
@@ -24,10 +22,11 @@ export default defineComponent({
   components: {
     NotizenListeExPanel,
     GetAllNotizenSlGroups,
-    Test
+    Test,
+    
 },
 
-  methods: {
+  methods: {    
     get() {
       const options = {
         method: 'GET',
@@ -50,21 +49,8 @@ export default defineComponent({
 </script>
 
 <style>
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Roboto', sans-serif;
-  }
-
-  .app {
-    width: 100vw;
-    height: 100vh;
-    background: #f3f3f3;
-    color: #15202b;
-  }
-
   .dark {
+    height: auto;
     background-color: #0d151b;
     color: #000000;
   }
