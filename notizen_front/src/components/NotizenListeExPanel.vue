@@ -143,6 +143,7 @@ export default defineComponent({
       this.loadingUpdate = true
 
       setTimeout(() => {
+        this.activePanel = ''
         this.$emit('refresh')
         this.loadingUpdate = false
       },1000)

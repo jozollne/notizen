@@ -4,6 +4,7 @@
       block
       :class="['ma-2']"
       @click="Post = !Post"
+      color=""
     >
       Neue Notiz
     </v-btn>
@@ -21,12 +22,14 @@
             :rules="rules"
             hide-details="auto"
             v-model="titel"
+            placeholder="Titel"
           >
           </v-text-field>
         </v-expand-transition>
 
         <v-expand-transition>
           <v-textarea
+            placeholder="Notiz"
             auto-grow
             rows="3"
             label="Text"
@@ -37,6 +40,7 @@
 
         <v-expand-transition>
           <v-text-field
+            placeholder="PS"
             label="PS"
             hide-details="auto"
             v-model="ps"

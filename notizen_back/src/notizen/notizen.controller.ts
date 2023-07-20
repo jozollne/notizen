@@ -11,7 +11,7 @@ export class NotizenController {
   create(@Body() createNotizenDto: CreateNotizenDto) {
     return this.notizenService.create(createNotizenDto);
   }
-
+  
   @Get()
   findAll() {
     return this.notizenService.findAll();

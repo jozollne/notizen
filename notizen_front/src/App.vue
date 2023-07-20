@@ -52,7 +52,8 @@ export default defineComponent({
 
 <style>
   .dark {
-    background-color: #1e1e1e;
+    height: 1000vh;
+    background-color: #313131;
     color: #000000;
   }
 </style>
